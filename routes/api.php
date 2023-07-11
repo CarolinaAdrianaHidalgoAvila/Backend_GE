@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\VideoController;
+use App\Http\Controllers\API\kmlContenedorController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -19,6 +21,12 @@ Route::prefix('video')->group(function () {
     Route::delete('/{id}',[ VideoController::class, 'delete']);
     Route::get('/{id}',[ VideoController::class, 'get']);
     Route::put('/{id}',[ VideoController::class, 'update']);
+});
+Route::prefix('kmlContenedor')->group(function () {
+    Route::get('/',[ kmlContenedorController::class, 'getAll']);
+    Route::post('/',[ kmlContenedorController::class, 'create']);
+    Route::delete('/{id}',[ kmlContenedorController::class, 'delete']);
+    Route::get('/{id}',[ kmlContenedorController::class, 'get']);
 });
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

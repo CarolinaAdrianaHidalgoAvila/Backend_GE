@@ -17,7 +17,8 @@ class CreateVideoTable extends Migration
             $table->id();
             $table->string('titulo');
             $table->string('url_contenido');
-            $table->bigInteger('id_encargado');
+            $table->timestamp('fecha_carga')->nullable();
+            $table->timestamp('fecha_modificacion')->nullable();
             $table->timestamps();
         });
     }
