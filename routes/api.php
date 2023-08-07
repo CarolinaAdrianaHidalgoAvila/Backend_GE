@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\ContenedorController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\VideoController;
@@ -27,6 +28,12 @@ Route::prefix('kmlContenedor')->group(function () {
     Route::post('/',[ kmlContenedorController::class, 'create']);
     Route::delete('/{id}',[ kmlContenedorController::class, 'delete']);
     Route::get('/{id}',[ kmlContenedorController::class, 'get']);
+
+    Route::get('/{idKmlContenedor}/contenedor', [ContenedorController::class, 'getAll']);
+    Route::post('/{idKmlContenedor}/contenedor', [ContenedorController::class, 'create']);
+    Route::delete('/{idKmlContenedor}/contenedor/{id}', [ContenedorController::class, 'delete']);
+    Route::get('/{idKmlContenedor}/contenedor/{id}', [ContenedorController::class, 'get']);
+    Route::put('/{idKmlContenedor}/contenedor/{id}', [ContenedorController::class, 'update']);
 });
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
