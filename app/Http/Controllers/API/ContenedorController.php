@@ -31,7 +31,7 @@ class ContenedorController extends Controller
         $xml = new SimpleXMLElement($contenidoKML);
         $namespaces = $xml->getNamespaces(true);
         // Iterar sobre los elementos del archivo KML y guardar los datos en la tabla "contenedor"
-        foreach ($xml->Document->Folder->Folder->Placemark as $placemark){
+        foreach ($xml->Document->Folder->Placemark as $placemark){
             $nombre_contenedor = (string) $placemark->name;
             $coordinates = explode(',', (string) $placemark->Point->coordinates);
             $longitud = (float) $coordinates[0];
