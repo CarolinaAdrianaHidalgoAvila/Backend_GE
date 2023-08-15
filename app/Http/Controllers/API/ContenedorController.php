@@ -31,21 +31,40 @@ class ContenedorController extends Controller
         $xml = new SimpleXMLElement($contenidoKML);
         $namespaces = $xml->getNamespaces(true);
         // Iterar sobre los elementos del archivo KML y guardar los datos en la tabla "contenedor"
-        foreach ($xml->Document->Folder->Placemark as $placemark){
-            $nombre_contenedor = (string) $placemark->name;
-            $coordinates = explode(',', (string) $placemark->Point->coordinates);
-            $longitud = (float) $coordinates[0];
-            $latitud = (float) $coordinates[1];
-            // Guardar los datos en la tabla "contenedor" usando el modelo Eloquent
-            Contenedor::create([
-                'nombre_contenedor' => $nombre_contenedor,
-                'latitud' => $latitud,
-                'longitud' => $longitud,
-                'tipo' => 'contenedor',
-                'fecha_modificacion' => now(),
-                'idKmlContenedor' => $idKmlContenedor,
-            ]);
+        foreach ($xml->Document->Folder as $folder) {
+            foreach ($folder->Placemark as $placemark) {
+                $nombre_contenedor = (string) $placemark->name;
+                $coordinates = explode(',', (string) $placemark->Point->coordinates);
+                $longitud = (float) $coordinates[0];
+                $latitud = (float) $coordinates[1];
+        
+                Contenedor::create([
+                    'nombre_contenedor' => $nombre_contenedor,
+                    'latitud' => $latitud,
+                    'longitud' => $longitud,
+                    'tipo' => 'contenedor',
+                    'fecha_modificacion' => now(),
+                    'idKmlContenedor' => $idKmlContenedor,
+                ]);
+            }
+        
+            foreach ($folder->Folder->Placemark as $nestedPlacemark) {
+                $nombre_contenedor = (string) $nestedPlacemark->name;
+                $coordinates = explode(',', (string) $nestedPlacemark->Point->coordinates);
+                $longitud = (float) $coordinates[0];
+                $latitud = (float) $coordinates[1];
+        
+                Contenedor::create([
+                    'nombre_contenedor' => $nombre_contenedor,
+                    'latitud' => $latitud,
+                    'longitud' => $longitud,
+                    'tipo' => 'contenedor',
+                    'fecha_modificacion' => now(),
+                    'idKmlContenedor' => $idKmlContenedor,
+                ]);
+            }
         }
+        
         // Retornar una respuesta indicando que el procesamiento fue exitoso
         return response()->json([
             'message' => 'Datos del archivo KML procesados y guardados correctamente',
