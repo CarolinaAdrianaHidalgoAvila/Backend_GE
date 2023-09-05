@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\VideoController;
 use App\Http\Controllers\API\kmlContenedorController;
+use App\Http\Controllers\API\KmlRutaController;
+use App\Http\Controllers\API\RutaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +37,19 @@ Route::prefix('kmlContenedor')->group(function () {
     Route::get('/{idKmlContenedor}/contenedor/{id}', [ContenedorController::class, 'get']);
     Route::put('/{idKmlContenedor}/contenedor/{id}', [ContenedorController::class, 'update']);
 });
+Route::prefix('kmlRuta')->group(function () {
+    Route::get('/',[ KmlRutaController::class, 'getAll']);
+    Route::post('/',[ KmlRutaController::class, 'create']);
+    Route::delete('/{id}',[ KmlRutaController::class, 'delete']);
+    Route::get('/{id}',[ KmlRutaController::class, 'get']);
+
+    Route::get('/{idKmlRuta}/ruta', [RutaController::class, 'getAll']);
+    Route::post('/{idKmlRuta}/ruta', [RutaController::class, 'create']);
+    Route::delete('/{idKmlRuta}/ruta/{id}', [RutaController::class, 'delete']);
+    Route::get('/{idKmlRuta}/ruta/{id}', [RutaController::class, 'get']);
+    Route::put('/{idKmlRuta}/ruta/{id}', [RutaController::class, 'update']);
+    Route::put('/{idKmlRuta}/ruta/{id}', [RutaController::class, 'updateSalto']);
+});   
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
