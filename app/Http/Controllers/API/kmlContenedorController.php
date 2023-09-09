@@ -30,13 +30,13 @@ class kmlContenedorController extends Controller
           $kmlContenedor->save();
   
           return response()->json([
-              'message' => 'File uploaded successfully.',
+              'message' => 'Documento cargado exitosamente.',
               'success' => true
           ], 200);
       }
   
       return response()->json([
-          'message' => 'No file uploaded.',
+          'message' => 'Ningún archivo cargado.',
           'success' => false
       ], 400);
       }
@@ -44,7 +44,7 @@ class kmlContenedorController extends Controller
       public function delete($id){
         $res = KmlContenedor::find($id)->delete();
         return response()->json([
-            'message' => "Successfully deleted",
+            'message' => "Eliminado con éxito",
             'success' => true
         ], 200);
       }
