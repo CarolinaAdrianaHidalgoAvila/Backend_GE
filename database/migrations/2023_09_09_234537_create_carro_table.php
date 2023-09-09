@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('salto', function (Blueprint $table) {
+        Schema::create('carro', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('idRuta');
+            $table->string('codigo_vehiculo');
+            $table->string('distrito');
+            $table->time('hora_inicio');
+            $table->time('hora_fin');
+            $table->double('distancia');
+            $table->string('observacion');
+            $table->timestamp('fecha_modificacion')->nullable();
+            $table->unsignedBigInteger('idRuta')->nullable(); // Clave foránea
             $table->foreign('idRuta')->references('id')->on('ruta')->onDelete('cascade');
-            $table->string('nombre_salto');
-            $table->double('inicio_latitud');
-            $table->double('inicio_longitud');
-            $table->double('fin_latitud')->nullable();
-            $table->double('fin_longitud')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('salto');
+        Schema::dropIfExists('carro');
     }
 };

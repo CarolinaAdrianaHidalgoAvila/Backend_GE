@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('carro', function (Blueprint $table) {
+        Schema::create('punto_linea', function (Blueprint $table) {
             $table->id();
+            $table->double('latitud');
+            $table->double('longitud');
+            $table->integer('orden');
+            $table->unsignedBigInteger('idRuta')->nullable(); // Clave foránea
+            $table->foreign('idRuta')->references('id')->on('ruta')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -22,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('carro');
+        Schema::dropIfExists('punto_linea');
     }
 };
