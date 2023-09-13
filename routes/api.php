@@ -49,6 +49,9 @@ Route::prefix('kmlRuta')->group(function () {
     Route::get('/{idKmlRuta}/ruta/{id}', [RutaController::class, 'get']);
     Route::put('/{idKmlRuta}/ruta/{id}', [RutaController::class, 'update']);
     Route::put('/{idKmlRuta}/ruta/{id}', [RutaController::class, 'updateSalto']);
+
+    Route::get('/{idKmlRuta}/ruta/{id}/puntos', [RutaController::class, 'getPuntosRuta']);
+
 });   
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
