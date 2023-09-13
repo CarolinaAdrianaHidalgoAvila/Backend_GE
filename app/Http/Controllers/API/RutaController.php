@@ -17,6 +17,10 @@ class RutaController extends Controller
         $data = Ruta::where('idKmlRuta', $idKmlRuta)->get();
         return response()->json($data, 200);
     }
+    public function getAllPuntos(){
+        $data = PuntoLinea::get();
+        return response()->json($data, 200);
+      }
 
     private function savePointsToPuntoLinea($idRuta, $coordinates)
 {
@@ -104,20 +108,27 @@ private function extractRutaData($rutaFolder)
 {
     $nombre_ruta = (string) $rutaFolder->name;
 
-    // Verificar si existe el elemento Placemark y Point
-    if (isset($rutaFolder->Placemark) && isset($rutaFolder->Placemark->Point)) {
-        $coordinatesInicio = $this->getCoordinates($rutaFolder->Placemark->Point);
-        list($latitud_inicio, $longitud_inicio) = $coordinatesInicio;
+    $latitud_inicio = 0.0; // Valor predeterminado para el inicio
+    $longitud_inicio = 0.0; // Valor predeterminado para el inicio
 
-        $coordinatesFin = $this->getCoordinates($rutaFolder->Placemark->Point);
-        list($latitud_fin, $longitud_fin) = $coordinatesFin;
-    } else {
-        // Manejo de error o valor predeterminado en caso de que falten datos
-        $latitud_inicio = 0.0; // Valor predeterminado
-        $longitud_inicio = 0.0; // Valor predeterminado
+    $latitud_fin = 0.0; // Valor predeterminado para el fin
+    $longitud_fin = 0.0; // Valor predeterminado para el fin
 
-        $latitud_fin = 0.0; // Valor predeterminado
-        $longitud_fin = 0.0; // Valor predeterminado
+    // Verificar si existe el elemento Placemark
+    if (isset($rutaFolder->Placemark)) {
+        foreach ($rutaFolder->Placemark as $placemark) {
+            $placemarkName = (string) $placemark->name;
+            $coordinates = $this->getCoordinates($placemark->Point);
+            list($latitud, $longitud) = $coordinates;
+
+            if ($placemarkName === 'Inicio') {
+                $latitud_inicio = $latitud;
+                $longitud_inicio = $longitud;
+            } elseif ($placemarkName === 'Fin') {
+                $latitud_fin = $latitud;
+                $longitud_fin = $longitud;
+            }
+        }
     }
 
     $tiene_saltos = is_array($rutaFolder->Placemark) || is_countable($rutaFolder->Placemark) ? count($rutaFolder->Placemark) > 3 : false;
@@ -131,7 +142,6 @@ private function extractRutaData($rutaFolder)
         'tiene_saltos' => $tiene_saltos,
     ];
 }
-
 
 // Función para obtener las coordenadas de un punto
 private function getCoordinates($point)
@@ -169,6 +179,10 @@ private function getCoordinates($point)
         $data = Ruta::where('id', $id)->where('idKmlRuta', $idKmlRuta)->first();
         return response()->json($data, 200);
       }
+      public function getPuntosRuta($idKmlRuta, $id) {
+        $puntos = PuntoLinea::where('idRuta', $id)->orderBy('orden')->get();
+        return response()->json($puntos, 200);
+    }
     public function update(Request $request, $idKmlRuta, $id)
     {
         $data['nombre_ruta'] = $request['nombre_ruta'];
