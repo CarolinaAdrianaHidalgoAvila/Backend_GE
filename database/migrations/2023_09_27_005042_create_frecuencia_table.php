@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('dia');
             $table->boolean('estado')->default(false);
-            $table->unsignedBigInteger('idCarro')->nullable(); // Clave foránea
-            $table->foreign('idCarro')->references('id')->on('carro')->onDelete('cascade');
+            $table->unsignedBigInteger('idDetalleRuta')->nullable(); // Clave foránea
+            $table->foreign('idDetalleRuta')->references('id')->on('detalle_ruta')->onDelete('cascade');
             $table->timestamps();
         });
     }

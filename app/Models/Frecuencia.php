@@ -14,7 +14,7 @@ class Frecuencia extends Model
     protected $fillable = [
       'dia',
       'estado',
-      'idCarro'
+      'idDetalleRuta'
     ];
  
 }
