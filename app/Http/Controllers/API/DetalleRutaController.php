@@ -26,6 +26,10 @@ class DetalleRutaController extends Controller
         $data = DetalleRuta::where('idRuta', $idRuta)->first();
         return response()->json($data, 200);
       }
+      public function getFrecuencias($idDetalleRuta) {
+        $data = Frecuencia::where('idDetalleRuta', $idDetalleRuta)->get();
+        return response()->json($data, 200);
+    }
     function convertirFraccionDecimalAHora($fraccionDecimal) {
         $horas = (int) ($fraccionDecimal * 24); // Obtener las horas
         $minutos = (int) (($fraccionDecimal * 24 * 60) % 60); // Obtener los minutos
@@ -38,122 +42,135 @@ class DetalleRutaController extends Controller
        // Validación del archivo Excel
        $request->validate([
         'file' => 'required|mimes:xlsx',
-    ]);
-
+        ]);
     // Obtener el archivo Excel del formulario
-    $file = $request->file('file');
-
+         $file = $request->file('file');
     // Cargar el archivo Excel
-    $spreadsheet = IOFactory::load($file);
-
+        $spreadsheet = IOFactory::load($file);
     // Obtener la hoja de trabajo (worksheet)
-    $worksheet = $spreadsheet->getActiveSheet();
-
+        $worksheet = $spreadsheet->getActiveSheet();
     // Recorrer las filas de datos (empezando desde la fila 2, asumiendo encabezados en la fila 1)
-    foreach ($worksheet->getRowIterator(3) as $row) {
-        $cellIterator = $row->getCellIterator();
-        $cellIterator->setIterateOnlyExistingCells(false);
+        foreach ($worksheet->getRowIterator(3) as $row) {
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
 
-        // Leer datos de cada columna en la fila
-        $data = [];
-        foreach ($cellIterator as $cell) {
-            $data[] = $cell->getValue();
-        }
-
-        // Buscar la ruta correspondiente usando código y nombre de ruta
-        $ruta = Ruta::where('codigo_carro', $data[1])
-            ->where('nombre_ruta', $data[2])
-            ->first();
-
-        if ($ruta) {
-            // Crear una nueva entrada en la tabla DetalleRuta con el ID de la ruta
-            $detalleRuta = new DetalleRuta([
-                'codigo_vehiculo' => $data[1],
-                'nombre_ruta' => $data[2],
-                'distrito' => $data[3],
-                'hora_inicio'  => $this->convertirFraccionDecimalAHora($data[4]),
-                'hora_fin'  => $this->convertirFraccionDecimalAHora($data[5]),
-                'peso' => $data[13],
-                'distancia' => $data[14],
-                'observacion' => $data[16],
-                'fecha_modificacion' => now(),
-                'idRuta' => $ruta->id, // Asignar el ID de la ruta encontrada
-            ]);
-            $detalleRuta->save();
-            $diasDeLaSemana = [
-                'LUNES',
-                'MARTES',
-                'MIÉRCOLES',
-                'JUEVES',
-                'VIERNES',
-                'SÁBADO',
-                'DOMINGO',
-            ];
-            // Crear entradas en la tabla Frecuencia para los días de la semana (columnas 7 a 13)
-            for ($i = 7; $i <= 13; $i++) {
-                $diaSemana = $diasDeLaSemana[$i - 7]; // Restar 7 para mapear correctamente al día correcto
-                $frecuencia = new Frecuencia([
-                    'dia' => $diaSemana,
-                    'estado' => ($data[$i] == 'VERDADERO'), // Asumiendo que 'VERDADERO' significa verdadero
-                    'idDetalleRuta' => $detalleRuta->id, // Asignar el ID del detalle de ruta
-                ]);
-                $frecuencia->save();
+            // Leer datos de cada columna en la fila
+            $data = [];
+            foreach ($cellIterator as $cell) {
+                $data[] = $cell->getValue();
             }
-        } else {
-            $detalleRuta = new DetalleRuta([
-                'codigo_vehiculo' => $data[1],
-                'nombre_ruta' => $data[2],
-                'distrito' => 'No hay este dato en KML',
-                'hora_inicio' => '00:00:00',
-                'hora_fin' => '00:00:00',
-                'peso' => 0, 
-                'distancia' => 0, 
-                'fecha_modificacion' => now(),
-                'observacion' => 'No hay este dato en KML',
-                'idRuta'=> null
-            ]);
-        
-            $detalleRuta->save();
-        }
-    }
 
-    // Retornar una respuesta indicando que el procesamiento fue exitoso
-    return response()->json([
-        'message' => 'Datos del archivo procesados y guardados correctamente',
-        'success' => true,
-    ], 200);
+            // Buscar la ruta correspondiente usando código y nombre de ruta
+            $ruta = Ruta::where('codigo_carro', $data[1])
+                ->where('nombre_ruta', $data[2])
+                ->first();
 
-    }
-    public function update(Request $request, $idRuta, $id)
-    {
-        $data['codigo_vehiculo'] = $request['codigo_vehiculo'];
-        $data['nombre_ruta'] = $request['nombre_ruta'];
-        $data['distrito'] = $request['distrito'];
-        $data['hora_inicio'] = $request['hora_inicio'];
-        $data['hora_fin'] = $request['hora_fin'];
-        $data['peso'] = $request['peso'];
-        $data['distancia'] = $request['distancia'];
-        $data['observacion'] = $request['observacion'];
-        $data['fecha_modificacion'] = $request['fecha_modificacion'];
-    
-        // Buscar el registro en la tabla "contenedor" por su id y actualizar los campos
-        DetalleRuta::where('id', $id)->where('idRuta', $idRuta)->update($data);
-        if ($request->has('frecuencias')) {
-            $frecuencias = $request->input('frecuencias');
-    
-            foreach ($frecuencias as $frecuenciaData) {
-                $frecuencia = Frecuencia::findOrNew($frecuenciaData['id']); // Buscar la frecuencia por ID o crear una nueva
-                $frecuencia->fill([
-                    'dia' => $frecuenciaData['dia'],
-                    'estado' => $frecuenciaData['estado']
+            if ($ruta) {
+                // Crear una nueva entrada en la tabla DetalleRuta con el ID de la ruta
+                $detalleRuta = new DetalleRuta([
+                    'codigo_vehiculo' => $data[1],
+                    'nombre_ruta' => $data[2],
+                    'distrito' => $data[3],
+                    'hora_inicio'  => $this->convertirFraccionDecimalAHora($data[4]),
+                    'hora_fin'  => $this->convertirFraccionDecimalAHora($data[5]),
+                    'peso' => $data[13],
+                    'distancia' => $data[14],
+                    'observacion' => $data[16],
+                    'fecha_modificacion' => now(),
+                    'idRuta' => $ruta->id, // Asignar el ID de la ruta encontrada
                 ]);
-                $frecuencia->save();
+                $detalleRuta->save();
+                $diasDeLaSemana = [
+                    'LUNES',
+                    'MARTES',
+                    'MIÉRCOLES',
+                    'JUEVES',
+                    'VIERNES',
+                    'SÁBADO',
+                    'DOMINGO',
+                ];
+                // Crear entradas en la tabla Frecuencia para los días de la semana (columnas 7 a 13)
+                for ($i = 7; $i <= 13; $i++) {
+                    $diaSemana = $diasDeLaSemana[$i - 7]; // Restar 7 para mapear correctamente al día correcto
+                    $frecuencia = new Frecuencia([
+                        'dia' => $diaSemana,
+                        'estado' => ($data[$i] == 'VERDADERO'), // Asumiendo que 'VERDADERO' significa verdadero
+                        'idDetalleRuta' => $detalleRuta->id, // Asignar el ID del detalle de ruta
+                    ]);
+                    $frecuencia->save();
+                }
+            } else {
+                $detalleRuta = new DetalleRuta([
+                    'codigo_vehiculo' => $data[1],
+                    'nombre_ruta' => $data[2],
+                    'distrito' => 'No hay este dato en KML',
+                    'hora_inicio' => '00:00:00',
+                    'hora_fin' => '00:00:00',
+                    'peso' => 0, 
+                    'distancia' => 0, 
+                    'fecha_modificacion' => now(),
+                    'observacion' => 'No hay este dato en KML',
+                    'idRuta'=> null
+                ]);
+            
+                $detalleRuta->save();
             }
         }
-    
+
+        // Retornar una respuesta indicando que el procesamiento fue exitoso
         return response()->json([
-            'message' => 'Detalle de ruta y frecuencias actualizados correctamente',
+            'message' => 'Datos del archivo procesados y guardados correctamente',
+            'success' => true,
+        ], 200);
+
+    }
+    public function updateDetalleRuta(Request $request, $idRuta, $id)
+{
+    $data['codigo_vehiculo'] = $request['codigo_vehiculo'];
+    $data['nombre_ruta'] = $request['nombre_ruta'];
+    $data['distrito'] = $request['distrito'];
+    $data['hora_inicio'] = $request['hora_inicio'];
+    $data['hora_fin'] = $request['hora_fin'];
+    $data['peso'] = $request['peso'];
+    $data['distancia'] = $request['distancia'];
+    $data['observacion'] = $request['observacion'];
+    $data['fecha_modificacion'] = $request['fecha_modificacion'];
+
+    // Buscar el registro en la tabla "contenedor" por su id y actualizar los campos
+    DetalleRuta::where('id', $id)->where('idRuta', $idRuta)->update($data);
+
+    return response()->json([
+        'message' => 'Detalle de ruta actualizado correctamente',
+        'success' => true
+    ], 200);
+}
+
+public function updateFrecuencias(Request $request, $idDetalleRuta)
+{
+    if ($request->has('frecuencias')) {
+        $frecuencias = $request->input('frecuencias');
+
+        foreach ($frecuencias as $frecuenciaData) {
+            // Aquí asumimos que las frecuencias están relacionadas con el detalle de ruta mediante el campo idDetalleRuta
+            $frecuencia = Frecuencia::where('id', $frecuenciaData['id'])->where('idDetalleRuta', $idDetalleRuta)->first();
+
+            if ($frecuencia) {
+                $frecuencia->estado = $frecuenciaData['estado'];
+                $frecuencia->save();
+            }
+        }
+
+        return response()->json([
+            'message' => 'Estados de frecuencias actualizados correctamente',
             'success' => true
         ], 200);
     }
+
+    return response()->json([
+        'message' => 'No se proporcionaron frecuencias para actualizar',
+        'success' => false
+    ], 400);
+}
+
+
 }

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Salto;
 use Illuminate\Http\Request;
 Use App\Models\Ruta;
 Use App\Models\PuntoLinea;
@@ -195,20 +194,6 @@ private function getCoordinates($point)
         $data['tiene_saltos'] = $request['tiene_saltos'];
     
         Ruta::where('id', $id)->where('idKmlRuta', $idKmlRuta)->update($data);
-    
-        return response()->json([
-            'message' => "Successfully updated",
-            'success' => true
-        ], 200);
-    }
-    public function updateSalto(Request $request, $idRuta,$id)
-    {
-        $data['nombre_salto'] = $request['nombre_salto'];
-        $data['inicio_latitud'] = $request['inicio_latitud'];
-        $data['inicio_longitud'] = $request['inicio_longitud'];
-        $data['fin_latitud'] = $request['fin_latitud'];
-        $data['fin_longitud'] = $request['fin_longitud'];
-        Salto::where('id', $id)->where('idRuta', $idRuta)->update($data);
     
         return response()->json([
             'message' => "Successfully updated",

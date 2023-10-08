@@ -52,7 +52,7 @@ Route::prefix('kmlRuta')->group(function () {
 
     Route::get('/{idKmlRuta}/ruta/{id}/puntos', [RutaController::class, 'getPuntosRuta']);
 
-    Route::post('/{idKmlRuta}/ruta/detalleRuta', [DetalleRutaController::class, 'import']);
+   // Route::post('/{idKmlRuta}/ruta/detalleRuta', [DetalleRutaController::class, 'import']);
 
 });   
 
@@ -60,7 +60,12 @@ Route::prefix('ruta')->group(function () {
     Route::post('/detalleRuta', [DetalleRutaController::class, 'import']);
     Route::get('/detalleRuta',[ DetalleRutaController::class, 'getAll']);
     Route::get('/{idRuta}/detalleRuta', [DetalleRutaController::class, 'get']);
-    Route::put('/{idRuta}/detalleRuta/{id}', [DetalleRutaController::class, 'update']);
+    Route::put('/{idRuta}/detalleRuta/{id}', [DetalleRutaController::class, 'updateDetalleRuta']);
+    Route::get('/{idRuta}/detalleRuta/{id}/frecuencias', [DetalleRutaController::class, 'getFrecuencias']);
+});
+Route::prefix('detalleRuta')->group(function () {
+    Route::get('/{id}/frecuencias', [DetalleRutaController::class, 'getFrecuencias']);
+    Route::put('/{id}/frecuencias', [DetalleRutaController::class, 'updateFrecuencias']);
 });
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
