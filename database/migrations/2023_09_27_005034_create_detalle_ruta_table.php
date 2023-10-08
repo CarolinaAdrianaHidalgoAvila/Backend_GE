@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('carro', function (Blueprint $table) {
+        Schema::create('detalle_ruta', function (Blueprint $table) {
             $table->id();
             $table->string('codigo_vehiculo');
+            $table->string('nombre_ruta');
             $table->string('distrito');
-            $table->time('hora_inicio');
-            $table->time('hora_fin');
-            $table->double('distancia');
-            $table->string('observacion');
+            $table->string('hora_inicio');
+            $table->string('hora_fin');
+            $table->integer('peso')->nullable();
+            $table->double('distancia')->nullable();
+            $table->string('observacion')->nullable();
             $table->timestamp('fecha_modificacion')->nullable();
             $table->unsignedBigInteger('idRuta')->nullable(); // Clave foránea
             $table->foreign('idRuta')->references('id')->on('ruta')->onDelete('cascade');
@@ -31,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('carro');
+        Schema::dropIfExists('detalle_ruta');
     }
 };
