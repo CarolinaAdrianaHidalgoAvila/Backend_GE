@@ -87,4 +87,50 @@ public function testUpdateVideoById()
     $this->assertEquals($newData['url_contenido'], $updatedVideo->url_contenido);
 }
 
+    public function testUpdateVideoWithMissingData(){
+        $video = Video::factory()->create();
+        $videoData = [
+            'titulo' => 'Nuevo Título del Video',
+        ];
+        $response = $this->put("/api/video/{$video->id}", $videoData);
+        $response->assertStatus(400);
+        $response->assertJson(['success' => false]);
+        $response->assertJsonFragment(['message' => 'Los datos proporcionados son inválidos']);
+    }
+    public function testCreateVideoWithMissingData(){
+        $videoData = [
+            'titulo' => 'Nuevo Título del Video',
+        ];
+        $response = $this->post("/api/video", $videoData);
+        $response->assertStatus(400);
+        $response->assertJson(['success' => false]);
+        $response->assertJsonFragment(['message' => 'Los datos proporcionados son inválidos']);
+    }
+    public function testDeleteNonExistentVideo()
+{
+    $nonExistentVideoId = 999; 
+    $response = $this->delete("/api/video/{$nonExistentVideoId}");
+    $response->assertStatus(404);
+    $response->assertJson(['success' => false]);
+    $response->assertJsonFragment(['message' => 'El video no fue encontrado']);
+}
+
+  public function testGetNonExistentVideo()
+  {
+      $nonExistentVideoId = 999;
+      $response = $this->get("/api/video/{$nonExistentVideoId}");
+      $response->assertStatus(404);
+      $response->assertJson(['success' => false]);
+      $response->assertJsonFragment(['message' => 'El video no fue encontrado']);
+  }
+  public function testUpdateVideoNotFound()
+    {
+        $nonExistentVideoId = 999; 
+        $response = $this->put("/api/video/{$nonExistentVideoId}", []);
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'El video no fue encontrado',
+            'success' => false,
+        ]);
+    }
 }
