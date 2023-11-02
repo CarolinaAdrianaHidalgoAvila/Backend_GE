@@ -41,16 +41,36 @@ class kmlContenedorController extends Controller
       ], 400);
       }
   
-      public function delete($id){
-        $res = KmlContenedor::find($id)->delete();
+  public function delete($id)
+  {
+      $kmlContenedor = KmlContenedor::find($id);
+
+      if (!$kmlContenedor) {
+          return response()->json([
+              'message' => "El registro no fue encontrado",
+              'success' => false
+          ], 404);
+      }
+
+      $kmlContenedor->delete();
+
+      return response()->json([
+          'message' => "Eliminado con éxito",
+          'success' => true
+      ], 200);
+  }
+  public function get($id)
+  {
+    $kmlContenedor = KmlContenedor::find($id);
+
+    if (!$kmlContenedor) {
         return response()->json([
-            'message' => "Eliminado con éxito",
-            'success' => true
-        ], 200);
-      }
-  
-      public function get($id){
-        $data = KmlContenedor::find($id);
-        return response()->json($data, 200);
-      }
+            'message' => "El registro no fue encontrado",
+            'success' => false
+        ], 404);
+    }
+
+    return response()->json($kmlContenedor, 200);
+  }
+
 }
