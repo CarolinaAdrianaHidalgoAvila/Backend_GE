@@ -17,7 +17,7 @@ class ContenedorFactory extends Factory
             'longitud' => $this->faker->randomFloat(6, -180, 180), 
             'fecha_modificacion' => now(),
             'tipo' => 'contenedor',
-            'idKmlContenedor' => KmlContenedor::factory() // Asumiendo que tienes un factory para KmlContenedor
+            'idKmlContenedor' => KmlContenedor::factory() 
         ];
     }
 }
