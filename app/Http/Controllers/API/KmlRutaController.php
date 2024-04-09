@@ -36,21 +36,41 @@ class KmlRutaController extends Controller
         }
     
         return response()->json([
-            'message' => 'Archivo no cargado',
+            'message' => 'Ningún archivo cargado.',
             'success' => false
         ], 400);
         }
     
-        public function delete($id){
-          $res = KmlRuta::find($id)->delete();
-          return response()->json([
-              'message' => "Archivo Borrado",
-              'success' => true
-          ], 200);
+        public function delete($id)
+        {
+            $kmlContenedor = KmlRuta::find($id);
+      
+            if (!$kmlContenedor) {
+                return response()->json([
+                    'message' => "El registro no fue encontrado",
+                    'success' => false
+                ], 404);
+            }
+      
+            $kmlContenedor->delete();
+      
+            return response()->json([
+                'message' => "Eliminado con éxito",
+                'success' => true
+            ], 200);
         }
-    
-        public function get($id){
-          $data = KmlRuta::find($id);
-          return response()->json($data, 200);
+        public function get($id)
+        {
+          $kmlContenedor = KmlRuta::find($id);
+      
+          if (!$kmlContenedor) {
+              return response()->json([
+                  'message' => "El registro no fue encontrado",
+                  'success' => false
+              ], 404);
+          }
+      
+          return response()->json($kmlContenedor, 200);
         }
+      
 }

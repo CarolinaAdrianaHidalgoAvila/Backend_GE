@@ -12,7 +12,6 @@ Use Log;
 
 class ContenedorController extends Controller
 {
-    // https://carbon.now.sh/
     public function getAll($idKmlContenedor){
       $data = Contenedor::where('idKmlContenedor', $idKmlContenedor)->get();
       return response()->json($data, 200);
@@ -72,13 +71,30 @@ class ContenedorController extends Controller
         ], 200);
     }
 
-    public function delete($idKmlContenedor,$id){
-      $res = Contenedor::where('id', $id)->where('idKmlContenedor', $idKmlContenedor)->delete();
-      return response()->json([
-          'message' => "Successfully deleted",
-          'success' => true
-      ], 200);
+    public function delete($idKmlContenedor, $id)
+    {
+        $contenedor = Contenedor::where('id', $id)->where('idKmlContenedor', $idKmlContenedor)->first();
+
+    if (!$contenedor) {
+        return response()->json([
+            'message' => 'El contenedor no fue encontrado', 
+            'success' => false], 
+            404);
     }
+    $res = $contenedor->delete();
+    if (!$res) {
+        return response()->json([
+            'message' => 'Error al eliminar el contenedor', 
+            'success' => false], 
+        400);
+    }
+
+    return response()->json([
+        'message' => 'Eliminado con éxito', 
+        'success' => true], 
+    200);
+    }
+
 
     public function get($idKmlContenedor,$id){
       $data = Contenedor::where('id', $id)->where('idKmlContenedor', $idKmlContenedor)->first();
@@ -87,18 +103,33 @@ class ContenedorController extends Controller
 
     public function update(Request $request, $idKmlContenedor, $id)
     {
+        $contenedor = Contenedor::where('id', $id)->where('idKmlContenedor', $idKmlContenedor)->first();
+        if (!$contenedor) {
+            return response()->json([
+                'message' => 'El contenedor no fue encontrado',
+                'success' => false
+            ], 404);
+        }
+    
         $data['nombre_contenedor'] = $request['nombre_contenedor'];
         $data['latitud'] = $request['latitud'];
         $data['longitud'] = $request['longitud'];
         $data['fecha_modificacion'] = $request['fecha_modificacion'];
         $data['tipo'] = $request['tipo'];
+
+        if (empty($data['nombre_contenedor']) || is_null($data['latitud']) || is_null($data['longitud'])) {
+            return response()->json([
+                'message' => 'Error al actualizar el contenedor', 
+                'success' => false],
+             400);
+        }
     
-        // Buscar el registro en la tabla "contenedor" por su id y actualizar los campos
-        Contenedor::where('id', $id)->where('idKmlContenedor', $idKmlContenedor)->update($data);
+        $contenedor->update($data);
+
     
         return response()->json([
-            'message' => "Successfully updated",
-            'success' => true
-        ], 200);
-    }
+            'message' => 'Successfully updated', 
+            'success' => true], 200);
+        }
+    
 }

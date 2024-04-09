@@ -15,17 +15,38 @@ class DetalleRutaController extends Controller
         $data = DetalleRuta::get();
         return response()->json($data, 200);
       }
-    public function delete($id){
-        $res = DetalleRuta::find($id)->delete();
-        return response()->json([
-            'message' => "Eliminado exitosamente",
-            'success' => true
-        ], 200);
+      public function delete($id)
+      {
+          $detalleRuta = DetalleRuta::find($id);
+      
+          if (!$detalleRuta) {
+              return response()->json([
+                  'message' => 'El registro no fue encontrado',
+                  'success' => false
+              ], 404);
+          }
+      
+          $detalleRuta->delete();
+      
+          return response()->json([
+              'message' => 'Eliminado exitosamente',
+              'success' => true
+          ], 200);
       }
+      
       public function get($idRuta){
         $data = DetalleRuta::where('idRuta', $idRuta)->first();
+    
+        if (!$data) {
+            return response()->json([
+                'message' => 'El registro no fue encontrado',
+                'success' => false,
+            ], 404);
+        }
+    
         return response()->json($data, 200);
-      }
+    }
+    
       public function getFrecuencias($idDetalleRuta) {
         $data = Frecuencia::where('idDetalleRuta', $idDetalleRuta)->get();
         return response()->json($data, 200);
@@ -45,10 +66,23 @@ class DetalleRutaController extends Controller
         ]);
     // Obtener el archivo Excel del formulario
          $file = $request->file('file');
+         if (!$file) {
+            return response()->json([
+                'message' => 'Ningún archivo fue subido.',
+                'success' => false,
+            ], 400); // 400 para indicar una solicitud incorrecta
+        }
     // Cargar el archivo Excel
         $spreadsheet = IOFactory::load($file);
     // Obtener la hoja de trabajo (worksheet)
         $worksheet = $spreadsheet->getActiveSheet();
+     // Verificar si el archivo está vacío
+     if ($worksheet->getHighestDataRow() <= 1) {
+        return response()->json([
+            'message' => 'El archivo está vacío.',
+            'success' => false,
+        ], 400); // 400 para indicar una solicitud incorrecta
+    }
     // Recorrer las filas de datos (empezando desde la fila 2, asumiendo encabezados en la fila 1)
         foreach ($worksheet->getRowIterator(3) as $row) {
             $cellIterator = $row->getCellIterator();
