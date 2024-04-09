@@ -5,18 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Video extends Model
+class Frecuencia extends Model
 {
     use HasFactory;
 
-    protected $table = "video";
+    protected $table = "frecuencia";
 
     protected $fillable = [
-      'titulo',
-      'url_contenido',
-      'fecha_carga',
-      'fecha_modificacion'
+      'dia',
+      'estado',
+      'idDetalleRuta'
     ];
  
 }
-

@@ -5,18 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Video extends Model
+class KmlRuta extends Model
 {
     use HasFactory;
-
-    protected $table = "video";
-
+    protected $table = "kml_ruta";
     protected $fillable = [
-      'titulo',
-      'url_contenido',
-      'fecha_carga',
-      'fecha_modificacion'
+      'nombre_archivo',
+      'path',
+      'fecha_carga'
     ];
- 
 }
-
